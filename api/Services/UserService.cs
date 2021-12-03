@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
+using server.Exceptions;
 using server.Models;
 
 namespace server.Services
@@ -22,11 +24,25 @@ namespace server.Services
 
         public async Task Create(User user) {
             user.Id = null;
-            await _users.InsertOneAsync(user);
+            try
+            {
+                await _users.InsertOneAsync(user);
+            }
+            catch (MongoWriteException e)
+            {
+                throw e.WriteError.Code switch
+                {
+                    11000 => new DoublicateException(),
+                    _ => new DatabaseException()
+                };
+            }
         }
 
         public async Task<User> Get(string id) =>
             await _users.Find(book => book.Id == id).FirstOrDefaultAsync();
+        
+        public async Task<User> GetByName(string username) =>
+            await _users.Find(book => book.Username == username).FirstOrDefaultAsync();
         
         public async Task<List<User>> Get() =>
             await _users.Find(_ => true).ToListAsync();

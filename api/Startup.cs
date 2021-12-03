@@ -35,6 +35,7 @@ namespace server
             services.AddSingleton<ITbsgDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<TbsgDatabaseSettings>>().Value);
             services.AddSingleton<UserService>();
+            services.AddSingleton<AuthService>();
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
         }
