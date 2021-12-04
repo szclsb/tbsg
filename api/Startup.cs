@@ -1,14 +1,13 @@
+using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using api;
 using api.Services;
 
-namespace server
+namespace api
 {
     public class Startup
     {
@@ -30,17 +29,10 @@ namespace server
                 sp.GetRequiredService<IOptions<TbsgDatabaseSettings>>().Value);
             services.AddSingleton<UserService>();
             services.AddSingleton<AuthService>();
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => 
-                options.TokenValidationParameters = new TokenValidationParameters    
-            {    
-                ValidateIssuer = true,    
-                ValidateAudience = true,    
-                ValidateLifetime = true,    
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = AuthService.GetIssuer(Configuration),    
-                ValidAudience = AuthService.GetAudience(Configuration),    
-                IssuerSigningKey = AuthService.GetKey(Configuration)
-            });
+            
+            services.AddSingleton<IPostConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
         }

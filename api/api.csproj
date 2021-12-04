@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>server</RootNamespace>
+        <RootNamespace>api</RootNamespace>
       <UserSecretsId>a2a924e4-62a8-4142-b624-66006e8d941e</UserSecretsId>
   </PropertyGroup>
 
