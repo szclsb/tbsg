@@ -2,6 +2,7 @@
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using server.Exceptions;
@@ -10,6 +11,7 @@ using server.Services;
 
 namespace server.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase

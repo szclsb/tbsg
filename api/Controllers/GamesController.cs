@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace ap.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/games")]
     public class GamesController : ControllerBase
@@ -27,6 +29,28 @@ namespace ap.Controllers
         public ActionResult<IEnumerable<string>> Get()
         {
             return Games;
+        }
+        
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        [Route("admin")]
+        public ActionResult<IEnumerable<string>> GetAdmin()
+        {
+            return new List<string>
+            {
+                "admin"
+            };
+        }
+        
+        [Authorize(Roles = "Caster")]
+        [HttpGet]
+        [Route("caster")]
+        public ActionResult<IEnumerable<string>> GetCaster()
+        {
+            return new List<string>
+            {
+                "caster"
+            };
         }
     }
 }

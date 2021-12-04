@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using server.Services;
 
@@ -36,6 +39,17 @@ namespace server
                 sp.GetRequiredService<IOptions<TbsgDatabaseSettings>>().Value);
             services.AddSingleton<UserService>();
             services.AddSingleton<AuthService>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => 
+                options.TokenValidationParameters = new TokenValidationParameters    
+            {    
+                ValidateIssuer = true,    
+                ValidateAudience = true,    
+                ValidateLifetime = true,    
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = AuthService.GetIssuer(Configuration),    
+                ValidAudience = AuthService.GetAudience(Configuration),    
+                IssuerSigningKey = AuthService.GetKey(Configuration)
+            });
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.UseMemberCasing());
         }
@@ -45,6 +59,7 @@ namespace server
         {
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
