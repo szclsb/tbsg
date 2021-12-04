@@ -1,5 +1,8 @@
-﻿using api.Services;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
+using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -16,14 +19,6 @@ namespace api
         
         public void PostConfigure(string name, JwtBearerOptions options)
         {
-            // options.Events = new JwtBearerEvents
-            // {
-            //     OnTokenValidated = context =>
-            //     {
-            //         Console.Out.WriteLine(context.Principal);
-            //         return null;
-            //     }
-            // };
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {

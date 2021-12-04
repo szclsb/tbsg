@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,23 +33,18 @@ namespace api.Controllers
         [Authorize(Roles = Role.Admin)]
         [HttpGet]
         [Route("admin")]
-        public ActionResult<IEnumerable<string>> GetAdmin()
+        public ActionResult<string> GetAdmin()
         {
-            return new List<string>
-            {
-                "admin"
-            };
+            var userId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return $"admin: {userId}";
         }
         
         [Authorize(Roles = Role.Caster)]
         [HttpGet]
         [Route("caster")]
-        public ActionResult<IEnumerable<string>> GetCaster()
+        public ActionResult<string> GetCaster()
         {
-            return new List<string>
-            {
-                "caster"
-            };
+            return "caster";
         }
     }
 }
