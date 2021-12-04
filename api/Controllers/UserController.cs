@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using server.Models;
-using server.Services;
+using api.Models;
+using api.Services;
 
-namespace server.Controllers
+namespace api.Controllers
 {
     [ApiController]
     [Route("api/users")]

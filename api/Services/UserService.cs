@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using server.Exceptions;
-using server.Models;
+using api.Exceptions;
+using api.Models;
 
-namespace server.Services
+namespace api.Services
 {
     public class UserService
     {

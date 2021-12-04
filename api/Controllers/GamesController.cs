@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using api.Models;
 
-namespace ap.Controllers
+namespace api.Controllers
 {
     [Authorize]
     [ApiController]
@@ -31,7 +32,7 @@ namespace ap.Controllers
             return Games;
         }
         
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Role.Admin)]
         [HttpGet]
         [Route("admin")]
         public ActionResult<IEnumerable<string>> GetAdmin()
@@ -42,7 +43,7 @@ namespace ap.Controllers
             };
         }
         
-        [Authorize(Roles = "Caster")]
+        [Authorize(Roles = Role.Caster)]
         [HttpGet]
         [Route("caster")]
         public ActionResult<IEnumerable<string>> GetCaster()

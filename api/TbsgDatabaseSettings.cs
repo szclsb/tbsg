@@ -1,4 +1,4 @@
-﻿namespace server
+﻿namespace api
 {
     public class TbsgDatabaseSettings : ITbsgDatabaseSettings
     {

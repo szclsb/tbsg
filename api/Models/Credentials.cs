@@ -1,4 +1,4 @@
-﻿namespace server.Models
+﻿namespace api.Models
 {
     public class Credentials
     {

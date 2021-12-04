@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace server.Exceptions
+namespace api.Exceptions
 {
     public class DatabaseException: Exception
     {

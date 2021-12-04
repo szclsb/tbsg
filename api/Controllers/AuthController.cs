@@ -2,14 +2,14 @@
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using api.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using server.Exceptions;
-using server.Models;
-using server.Services;
+using api.Models;
+using api.Services;
 
-namespace server.Controllers
+namespace api.Controllers
 {
     [AllowAnonymous]
     [ApiController]

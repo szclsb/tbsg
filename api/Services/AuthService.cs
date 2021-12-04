@@ -7,9 +7,9 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using server.Models;
+using api.Models;
 
-namespace server.Services
+namespace api.Services
 {
     public class AuthService
     {
@@ -44,10 +44,11 @@ namespace server.Services
             var claims = new List<Claim>
             {
                 new (JwtRegisteredClaimNames.Sub, user.Id),
-                new (ClaimTypes.Name, user.Username),
-                new (ClaimTypes.Email, user.Email)
+                new (JwtRegisteredClaimNames.UniqueName, user.Username),
+                new (JwtRegisteredClaimNames.Email, user.Email)
             };
-            claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            //claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(user.Roles.Select(role => new Claim("role", role)));
             var token = new JwtSecurityToken(
                 issuer: _issuer,    
                 audience: _audience,
