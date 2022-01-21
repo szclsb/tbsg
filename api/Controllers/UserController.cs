@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using api.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using api.Models;
@@ -12,61 +14,86 @@ namespace api.Controllers
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
-        private readonly UserService _userService;
-        
-        public UserController(UserService service, ILogger<UserController> logger)
+        private readonly IUserService _userService;
+
+        public UserController(IUserService service, ILogger<UserController> logger)
         {
             _logger = logger;
             _userService = service;
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> Create(User user)
+        public async Task<IActionResult> Create(User user)
         {
-            await _userService.Create(user);
-            _logger.LogInformation($"Created user {user.Username} with id {user.Id}");
-            return CreatedAtRoute("GetUser", new { id = user.Id }, user);
-        }
-        
-        [HttpGet("{id}", Name = "GetUser")]
-        public async Task<ActionResult<User>> Find(string id)
-        {
-            var user = await _userService.Get(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                await _userService.Create(user);
+                _logger.LogInformation($"Created user {user.Username} with id {user.Id}");
+                return CreatedAtRoute("FindUser", new { id = user.Id }, user);
             }
-            return user;
+            catch (DoublicateException de)
+            {
+                return Conflict();
+            }
         }
-        
+
+        [HttpGet("{id}", Name = "FindUser")]
+        public async Task<IActionResult> Find(string id)
+        {
+            try
+            {
+                var user = await _userService.Find(id);
+                return user == null ? NotFound() : Ok(user);
+            }
+            catch (DoublicateException de)
+            {
+                return Conflict();
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> FindAll()
         {
-            return await _userService.Get();
+            return Ok(await _userService.FindMany());
         }
-        
+
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> Update(string id, User user)
+        public async Task<IActionResult> Update(string id, User user)
         {
-            var dbUser = await _userService.Get(id);
-            if (dbUser == null)
+            try
             {
-                return NotFound();
+                var dbUser = await _userService.Find(id);
+                if (dbUser == null)
+                {
+                    return NotFound();
+                }
+
+                await _userService.Update(id, user);
+                return NoContent();
             }
-            await _userService.Update(id, user);
-            return NoContent();
+            catch (DoublicateException de)
+            {
+                return Conflict();
+            }
         }
-        
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> Delete(string id)
         {
-            var user = await _userService.Get(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userService.Find(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                await _userService.Delete(user.Id);
+                return NoContent();
             }
-            await _userService.Remove(user.Id);
-            return NoContent();
+            catch (DoublicateException de)
+            {
+                return Conflict();
+            }
         }
     }
 }

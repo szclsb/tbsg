@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using api.Exceptions;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +15,10 @@ namespace api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly AuthService _authService;
         
-        public AuthController(UserService userService, AuthService authService, ILogger<AuthController> logger)
+        public AuthController(IUserService userService, AuthService authService, ILogger<AuthController> logger)
         {
             _logger = logger;
             _userService = userService;
@@ -56,7 +54,7 @@ namespace api.Controllers
         public async Task<ActionResult<string>> Login(Credentials credentials)
         {
             //TODO verify user input
-            var user = await _userService.GetByName(credentials.Username);
+            var user = await _userService.FindByUsername(credentials.Username);
             if (user == null)
             {
                 return BadRequest();

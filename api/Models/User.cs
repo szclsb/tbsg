@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace api.Models
 {
-    public class User
+    public class User : IEntity
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

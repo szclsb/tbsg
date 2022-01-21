@@ -1,4 +1,5 @@
 using System;
+using api.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using api.Services;
+using api.Services.MongoDB;
 
 namespace api
 {
@@ -27,8 +29,10 @@ namespace api
                 Configuration.GetSection(nameof(TbsgDatabaseSettings)));
             services.AddSingleton<ITbsgDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<TbsgDatabaseSettings>>().Value);
-            services.AddSingleton<UserService>();
             services.AddSingleton<AuthService>();
+            
+            services.AddSingleton<Database>();
+            services.AddSingleton<IUserService, UserService>();
             
             services.AddSingleton<IPostConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
