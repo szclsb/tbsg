@@ -9,9 +9,9 @@ using api.Services;
 
 namespace api.Controllers
 {
-    [AllowAnonymous]
     [ApiController]
     [Route("api/auth")]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;

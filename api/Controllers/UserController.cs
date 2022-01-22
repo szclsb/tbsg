@@ -6,11 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using api.Models;
 using api.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace api.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
