@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using api.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -7,13 +8,12 @@ using Microsoft.Extensions.Logging;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 
 namespace api.Controllers
 {
     [ApiController]
     [Route("api/users")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -26,6 +26,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> Create(User user)
         {
             try
@@ -43,10 +44,16 @@ namespace api.Controllers
         [HttpGet("{id}", Name = "FindUser")]
         public async Task<IActionResult> Find(string id)
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             try
             {
-                var user = await _userService.Find(id);
-                return user == null ? NotFound() : Ok(user);
+                if (userId == id || HttpContext.User.IsInRole(Role.Admin))
+                {
+                    var user = await _userService.Find(id);
+                    return user == null ? NotFound() : Ok(user);
+                }
+
+                return Forbid();
             }
             catch (DoublicateException de)
             {
@@ -55,6 +62,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<IEnumerable<User>>> FindAll()
         {
             return Ok(await _userService.FindMany());
@@ -63,16 +71,22 @@ namespace api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, User user)
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             try
             {
-                var dbUser = await _userService.Find(id);
-                if (dbUser == null)
+                if (userId == id || HttpContext.User.IsInRole(Role.Admin))
                 {
-                    return NotFound();
+                    var dbUser = await _userService.Find(id);
+                    if (dbUser == null)
+                    {
+                        return NotFound();
+                    }
+
+                    await _userService.Update(id, user);
+                    return NoContent();
                 }
 
-                await _userService.Update(id, user);
-                return NoContent();
+                return Forbid();
             }
             catch (DoublicateException de)
             {
@@ -83,15 +97,22 @@ namespace api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> Delete(string id)
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             try
             {
-                var user = await _userService.Find(id);
-                if (user == null)
+                if (userId == id || HttpContext.User.IsInRole(Role.Admin))
                 {
-                    return NotFound();
+                    var user = await _userService.Find(id);
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    await _userService.Delete(user.Id);
+                    return NoContent();
                 }
-                await _userService.Delete(user.Id);
-                return NoContent();
+
+                return Forbid();
             }
             catch (DoublicateException de)
             {
